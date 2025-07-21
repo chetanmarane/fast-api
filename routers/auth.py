@@ -4,7 +4,7 @@ from schemas.user import UserCreate, UserLogin
 from services.user import create_user, authenticate_user
 from database import get_db
 
-router = APIRouter(prefix="/auth", tags=["Auth"])
+router = APIRouter(tags=["auth"])
 
 @router.post("/register/")
 def register(user: UserCreate, db: Session = Depends(get_db)):

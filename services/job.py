@@ -1,4 +1,4 @@
-from models import Job, Application
+from models.models import Job, Application
 from sqlalchemy.orm import Session
 from schemas.job import JobCreate, JobApply
 

@@ -1,4 +1,4 @@
-from models import User
+from models.models import User
 from sqlalchemy.orm import Session
 from schemas.user import UserCreate, UserLogin
 from fastapi import HTTPException
@@ -13,6 +13,14 @@ def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 def create_user(db: Session, user: UserCreate):
+    existing_user = db.query(User).filter(User.username == user.username).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username already exists")
+
+    existing_email = db.query(User).filter(User.email == user.email).first()
+    if existing_email:
+        raise HTTPException(status_code=400, detail="Email already exists")
+
     hashed_password = get_password_hash(user.password)
     db_user = User(username=user.username, email=user.email, hashed_password=hashed_password)
     db.add(db_user)
