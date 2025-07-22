@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from .schemas import UserCreate, UserLogin
 from .models import User
-from .utils import get_password_hash, verify_password
+from auth.utils import get_password_hash, verify_password
 
 
 def get_user_by_username(db: Session, email: str):
