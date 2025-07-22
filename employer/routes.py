@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from schemas.job import JobCreate
-from services.job import create_job, get_jobs
+from .schemas import JobCreate
+from .employer_services import create_job
+from employee.employee_services import get_jobs
 from database import get_db
 
 router = APIRouter()
