@@ -15,7 +15,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 # Create tables
-print("Registered tables:", Base.metadata.tables)
 Base.metadata.create_all(bind=engine)
 
 @app.get("/health", tags=["Health Checks"])

@@ -1,11 +1,15 @@
 from fastapi import HTTPException
+from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 from .schemas import UserCreate, UserLogin
 from .models import User
 from auth.utils import get_password_hash, verify_password
 
 
-def get_user_by_username(db: Session, email: str):
+def get_user_by_username(db: Session, username: str):
+    return db.query(User).filter(User.username == username).first()
+
+def get_user_by_email(db: Session, email: EmailStr):
     return db.query(User).filter(User.email == email).first()
 
 def create_user(db: Session, user: UserCreate):
@@ -13,7 +17,7 @@ def create_user(db: Session, user: UserCreate):
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
 
-    existing_email = db.query(User).filter(User.email == user.email).first()
+    existing_email = get_user_by_email(db, user.email)
     if existing_email:
         raise HTTPException(status_code=400, detail="Email already exists")
 
@@ -25,7 +29,7 @@ def create_user(db: Session, user: UserCreate):
     return db_user
 
 
-def get_user(db: Session, user_id: int):
+def get_user_by_userid(db: Session, user_id: int):
     return db.query(User).filter(User.id == user_id).first()
 
 def get_users(db: Session):
@@ -38,8 +42,4 @@ def delete_user(db: Session, user_id: int):
         db.commit()
     return
 
-def authenticate_user(db: Session, user: UserLogin):
-    db_user = db.query(User).filter(User.username == user.username).first()
-    if not db_user or not verify_password(user.password, db_user.hashed_password):
-        return None
-    return db_user
+

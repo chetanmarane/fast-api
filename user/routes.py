@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from .schemas import UserCreate, UserSchema
-from .user_services import create_user, authenticate_user, get_users, get_user, delete_user
+from .user_service import create_user, get_users, get_user_by_userid, delete_user
+from user.models import User
+from auth.auth_service import get_current_active_user
 from database import get_db
 
 user_router = APIRouter(prefix="/users", tags=["Users"])
@@ -13,15 +15,15 @@ def user_list(db: Session = Depends(get_db)):
     return db_users
 
 
-# @user_router.get('/me', response_model=UserSchema)
-# def user_list(current_user: User = Depends(get_current_active_user)):
-#     return current_user
+@user_router.get('/me', response_model=UserSchema)
+def current_user(current_user: User = Depends(get_current_active_user)):
+    return current_user
 
 
 
 @user_router.get('/{user_id}', response_model=UserSchema)
-def user_detail(user_id: int, db: Session = Depends(get_db)):
-    db_user = get_user(db, user_id)
+def get_user_details(user_id: int, db: Session = Depends(get_db)):
+    db_user = get_user_by_userid(db, user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -30,7 +32,7 @@ def user_detail(user_id: int, db: Session = Depends(get_db)):
 
 @user_router.delete('/{user_id}')
 def user_delete(user_id: int, db: Session = Depends(get_db)):
-    db_user = get_user(db, user_id)
+    db_user = get_user_by_userid(db, user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -42,14 +44,3 @@ def user_register(user: UserCreate, db: Session = Depends(get_db)):
     db_user = create_user(db, user)
     return {"message": "User registered", "username": db_user.username}
 
-
-# @auth_router.post("/login/")
-# def login(user: UserLogin, db: Session = Depends(get_db)):
-#     db_user = authenticate_user(db, user)
-#     if not db_user:
-#         raise HTTPException(status_code=400, detail="Invalid credentials")
-#     return {"message": "Login successful", "username": db_user.username}
-
-# @auth_router.post("/logout/")
-# def logout():
-#     return {"message": "Logout successful"}

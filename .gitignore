@@ -139,3 +139,4 @@ response_agristack_files/
 logs.csv
 tfidf_embeddings.pkl
 python_client/image_classification/trained_models/
+demo.ipynb
